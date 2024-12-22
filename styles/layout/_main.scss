@@ -48,21 +48,28 @@ a {
 .custom-tabmenu-container::-webkit-scrollbar-thumb:hover {
     background-color: #aaa;
 }
-
 .custom-tab-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 8px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.custom-tab-header.active-tab {
+    border-bottom: 2px solid var(--theme-color, #007ad9); /* Use theme color */
+    font-weight: bold;
+    color: var(--theme-color, #007ad9);
 }
 
 .custom-tab-header .close-btn {
     background: none;
     border: none;
-    color: #888;
+    color: inherit; /* Match text color */
     cursor: pointer;
     font-size: 16px;
-    margin-left: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,7 +80,7 @@ a {
 }
 
 .custom-tab-header .pi {
-    font-size: 14px; /* Adjust icon size if needed */
+    font-size: 14px; /* Adjust icon size */
 }
 
 /* CSS to align header text vertically and at the bottom */

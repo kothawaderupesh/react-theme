@@ -4,11 +4,13 @@ import { Tab } from '@/types/tab';
 
 
 interface CustomTabMenuProps {
-    model: Tab[]; // Use our Tab type
-    activeItem?: Tab; // Optional activeItem
-    activeIndex?: number; // Optional activeIndex
+    model: Tab[];
+    activeItem?: Tab;
+    activeIndex?: number;
     onTabChange: (event: TabMenuTabChangeEvent) => void;
-    scrollable?: boolean; // Add scrollable prop
+    onCloseTab: (tab: Tab) => void;
+    scrollable?: boolean;
+    themeColor?: string; // Optional theme color for highlighting
 }
 
 const CustomTabMenu: React.FC<CustomTabMenuProps> = ({
@@ -16,14 +18,46 @@ const CustomTabMenu: React.FC<CustomTabMenuProps> = ({
     activeItem,
     activeIndex,
     onTabChange,
+    onCloseTab,
     scrollable = false,
+    themeColor = '#007ad9', // Default theme color
 }) => {
     const calculatedActiveIndex = useMemo(() => {
         if (activeItem) {
             return model.findIndex((tab) => tab.id === activeItem.id);
         }
-        return activeIndex ?? 0; // Default to 0 if neither is provided
+        return activeIndex ?? 0;
     }, [activeItem, activeIndex, model]);
+
+    // Render the tab with label and close button
+    const renderTab = (tab: Tab, index: number) => {
+        const isActive = index === calculatedActiveIndex;
+
+        return (
+            <div
+                className={`custom-tab-header ${isActive ? 'active-tab' : ''}`}
+                style={isActive ? { borderColor: themeColor, color: themeColor } : {}}
+            >
+                <span>{tab.label}</span>
+                <button
+                    className="close-btn"
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering tab switch
+                        onCloseTab(tab);
+                    }}
+                    title="Close Tab"
+                >
+                    <i className="pi pi-times"></i>
+                </button>
+            </div>
+        );
+    };
+
+    // Customize each tab with a template
+    const customizedModel = model.map((tab, index) => ({
+        ...tab,
+        template: renderTab(tab, index), // Add active state styling
+    }));
 
     return (
         <div
@@ -31,7 +65,7 @@ const CustomTabMenu: React.FC<CustomTabMenuProps> = ({
             style={{ overflowX: scrollable ? 'auto' : 'visible', whiteSpace: 'nowrap' }}
         >
             <PrimeTabMenu
-                model={model}
+                model={customizedModel}
                 activeIndex={calculatedActiveIndex}
                 onTabChange={onTabChange}
             />
