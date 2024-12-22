@@ -48,3 +48,74 @@ a {
 .custom-tabmenu-container::-webkit-scrollbar-thumb:hover {
     background-color: #aaa;
 }
+
+.custom-tab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+}
+
+.custom-tab-header .close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-tab-header .close-btn:hover {
+    color: #d9534f; /* Hover effect: red */
+}
+
+.custom-tab-header .pi {
+    font-size: 14px; /* Adjust icon size if needed */
+}
+
+/* CSS to align header text vertically and at the bottom */
+.vertical-header {
+    writing-mode: vertical-rl; /* Makes the text vertical */
+    transform: rotate(180deg); /* Inverts the text direction */
+    text-align: center; /* Centers the text horizontally */
+    white-space: nowrap; /* Prevents wrapping */
+    padding: 0 5px; /* Adds padding to the text */
+    min-height: 80px; /* Ensures a minimum height for the header */
+    height: auto; /* Lets the height adjust based on text length */
+    position: relative;
+    top: 100%; /* Moves the text to the bottom */
+}
+
+/* CSS to show borders on the entire DataTable */
+.p-datatable {
+    border: 1px solid #ccc; /* Adds border around the table */
+}
+
+.p-datatable thead th, .p-datatable tbody td {
+    border: 1px solid #ccc; /* Adds border to each cell */
+}
+
+.p-datatable .p-column-header {
+    border-bottom: 2px solid #ccc; /* Adds a thicker border below the header */
+}
+
+/* Fixed width for the dropdown column */
+.p-datatable .p-column-header,
+.p-datatable .p-column-body {
+    width: 300px; /* Adjust this width as needed */
+}
+
+/* Fixed width for location column */
+.p-datatable .p-column-header,
+.p-datatable .p-column-body {
+    width: 200px; /* Adjust this width as needed */
+}
+
+/* Fixed width for checkboxes columns */
+.p-datatable .p-column-header,
+.p-datatable .p-column-body {
+    width: 100px; /* Adjust this width as needed */
+}
