@@ -1,5 +1,5 @@
 'use client';
-import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
 import { Ripple } from 'primereact/ripple';
 import { classNames } from 'primereact/utils';
@@ -8,9 +8,11 @@ import { CSSTransition } from 'react-transition-group';
 import { MenuContext } from './context/menucontext';
 import { AppMenuItemProps } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useTabContext } from './context/tab-context';
 
 const AppMenuitem = (props: AppMenuItemProps) => {
     const pathname = usePathname();
+    const { openNewTab } = useTabContext();
     const searchParams = useSearchParams();
     const { activeMenu, setActiveMenu } = useContext(MenuContext);
     const item = props.item;
@@ -38,6 +40,8 @@ const AppMenuitem = (props: AppMenuItemProps) => {
         //execute command
         if (item!.command) {
             item!.command({ originalEvent: event, item: item });
+        } else if (item!.to) {
+            openNewTab(item!.to, item!.label ? item!.label : 'UNTITLED');
         }
 
         // toggle active state

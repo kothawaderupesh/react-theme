@@ -1,67 +1,75 @@
+// context/TabContext.tsx
 'use client';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { Tab } from '@/types/tab';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-
-interface TabContextProps {
-    tabs: Tab[];
-    activeTab: Tab;
-    addTab: () => void;
-    removeTab: (tabToRemove: Tab) => void;
-    changeActiveTab: (tab: Tab) => void;
+export interface Tab {
+    id: string;
+    title: string;
+    path: string;
+    closable?: boolean;
+    content: ReactNode;
 }
 
-const TabContext = createContext<TabContextProps | undefined>(undefined);
+interface TabContextType {
+    tabs: Tab[];
+    activeTab: string;
+    removeTab: (tabId: string) => void;
+    setActiveTab: (tabId: string) => void;
+    openNewTab: (path: string, title: string) => void;
+}
+
+const TabContext = createContext<TabContextType | undefined>(undefined);
 
 export const TabProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [tabs, setTabs] = useState<Tab[]>([]);
+    const [activeTab, setActiveTab] = useState<string>('');
     const router = useRouter();
-    const [tabs, setTabs] = useState<Tab[]>([
-        { id: '1', label: 'Home', icon: 'pi pi-home', url: '/' },
-    ]);
-    const [activeTab, setActiveTab] = useState<Tab>(tabs[0]);
 
-    const addTab = () => {
-        const newId = `${tabs.length + 1}`;
-        const newTab: Tab = {
-            id: newId,
-            label: `Page ${newId}`,
-            icon: 'pi pi-file',
-            url: `/page${newId}`,
-        };
-        setTabs([...tabs, newTab]);
-        setActiveTab(newTab);
-        router.push(newTab.url);
+    const addTab = (tab: Tab) => {
+        setTabs((prev) => {
+            const exists = prev.find((t) => t.id === tab.id);
+            if (!exists) return [...prev, tab];
+            return prev;
+        });
+        setActiveTab(tab.id);
     };
 
-    const removeTab = (tabToRemove: Tab) => {
-        const updatedTabs = tabs.filter((tab) => tab.id !== tabToRemove.id);
-
-        if (tabToRemove.id === activeTab.id) {
-            const nextActiveTab = updatedTabs[updatedTabs.length - 1] || tabs[0];
-            setActiveTab(nextActiveTab);
-            router.push(nextActiveTab?.url || '/');
+    const removeTab = (tabId: string) => {
+        let _tabs = tabs.filter((tab) => tab.id !== tabId);
+        setTabs(_tabs);
+        if (tabId === activeTab && _tabs.length > 0) {
+            openTab(_tabs[0]);
+        } if (_tabs.length === 0) {
+            router.push('/');
         }
-
-        setTabs(updatedTabs);
     };
 
-    const changeActiveTab = (tab: Tab) => {
-        setActiveTab(tab);
-        router.push(tab.url);
+    const openNewTab = (path: string, title: string) => {
+        addTab({
+            id: path,
+            title,
+            path,
+            closable: true,
+            content: <div>{title} Content</div>,
+        });
+        router.push(path);
+    };
+
+    const openTab = (tab: Tab) => {
+        setActiveTab(tab.id);
+        router.push(tab.path);
     };
 
     return (
-        <TabContext.Provider value={{ tabs, activeTab, addTab, removeTab, changeActiveTab }}>
+        <TabContext.Provider value={{ tabs, activeTab, removeTab, setActiveTab, openNewTab }}>
             {children}
         </TabContext.Provider>
     );
 };
 
-export const useTabContext = (): TabContextProps => {
+export const useTabContext = () => {
     const context = useContext(TabContext);
-    if (!context) {
-        throw new Error('useTabContext must be used within a TabProvider');
-    }
+    if (!context) throw new Error('useTabContext must be used within a TabProvider');
     return context;
 };

@@ -13,131 +13,142 @@ import { LayoutContext } from './context/layoutcontext';
 import { PrimeReactContext } from 'primereact/api';
 import { ChildContainerProps, LayoutState, AppTopbarRef } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
+import TabManager from './TabManager';
+import { TabProvider, useTabContext } from './context/tab-context';
+import { AppMenuConfig as menuConfig, findTitleByPath } from './AppMenuConfig';
 
 const Layout = ({ children }: ChildContainerProps) => {
-    const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
-    const { setRipple } = useContext(PrimeReactContext);
-    const topbarRef = useRef<AppTopbarRef>(null);
-    const sidebarRef = useRef<HTMLDivElement>(null);
-    const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
-        type: 'click',
-        listener: (event) => {
-            const isOutsideClicked = !(
-                sidebarRef.current?.isSameNode(event.target as Node) ||
-                sidebarRef.current?.contains(event.target as Node) ||
-                topbarRef.current?.menubutton?.isSameNode(event.target as Node) ||
-                topbarRef.current?.menubutton?.contains(event.target as Node)
-            );
+        const { tabs, openNewTab } = useTabContext();
+        const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
+        const { setRipple } = useContext(PrimeReactContext);
+        const topbarRef = useRef<AppTopbarRef>(null);
+        const sidebarRef = useRef<HTMLDivElement>(null);
+        const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
+                type: 'click',
+                listener: (event) => {
+                        const isOutsideClicked = !(
+                                sidebarRef.current?.isSameNode(event.target as Node) ||
+                                sidebarRef.current?.contains(event.target as Node) ||
+                                topbarRef.current?.menubutton?.isSameNode(event.target as Node) ||
+                                topbarRef.current?.menubutton?.contains(event.target as Node)
+                        );
 
-            if (isOutsideClicked) {
+                        if (isOutsideClicked) {
+                                hideMenu();
+                        }
+                }
+        });
+
+        const pathname = usePathname();
+        const searchParams = useSearchParams();
+        useEffect(() => {
+                if (pathname !== '/') {
+                        const title = findTitleByPath(menuConfig, pathname) || 'Untitled';
+                        openNewTab(pathname, title);
+                }
                 hideMenu();
-            }
-        }
-    });
-
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-    useEffect(() => {
-        hideMenu();
-        hideProfileMenu();
-    }, [pathname, searchParams]);
-
-    const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
-        type: 'click',
-        listener: (event) => {
-            const isOutsideClicked = !(
-                topbarRef.current?.topbarmenu?.isSameNode(event.target as Node) ||
-                topbarRef.current?.topbarmenu?.contains(event.target as Node) ||
-                topbarRef.current?.topbarmenubutton?.isSameNode(event.target as Node) ||
-                topbarRef.current?.topbarmenubutton?.contains(event.target as Node)
-            );
-
-            if (isOutsideClicked) {
                 hideProfileMenu();
-            }
-        }
-    });
+        }, [pathname, searchParams]);
 
-    const hideMenu = () => {
-        setLayoutState((prevLayoutState: LayoutState) => ({
-            ...prevLayoutState,
-            overlayMenuActive: false,
-            staticMenuMobileActive: false,
-            menuHoverActive: false
-        }));
-        unbindMenuOutsideClickListener();
-        unblockBodyScroll();
-    };
+        const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
+                type: 'click',
+                listener: (event) => {
+                        const isOutsideClicked = !(
+                                topbarRef.current?.topbarmenu?.isSameNode(event.target as Node) ||
+                                topbarRef.current?.topbarmenu?.contains(event.target as Node) ||
+                                topbarRef.current?.topbarmenubutton?.isSameNode(event.target as Node) ||
+                                topbarRef.current?.topbarmenubutton?.contains(event.target as Node)
+                        );
 
-    const hideProfileMenu = () => {
-        setLayoutState((prevLayoutState: LayoutState) => ({
-            ...prevLayoutState,
-            profileSidebarVisible: false
-        }));
-        unbindProfileMenuOutsideClickListener();
-    };
+                        if (isOutsideClicked) {
+                                hideProfileMenu();
+                        }
+                }
+        });
 
-    const blockBodyScroll = (): void => {
-        if (document.body.classList) {
-            document.body.classList.add('blocked-scroll');
-        } else {
-            document.body.className += ' blocked-scroll';
-        }
-    };
+        const hideMenu = () => {
+                setLayoutState((prevLayoutState: LayoutState) => ({
+                        ...prevLayoutState,
+                        overlayMenuActive: false,
+                        staticMenuMobileActive: false,
+                        menuHoverActive: false
+                }));
+                unbindMenuOutsideClickListener();
+                unblockBodyScroll();
+        };
 
-    const unblockBodyScroll = (): void => {
-        if (document.body.classList) {
-            document.body.classList.remove('blocked-scroll');
-        } else {
-            document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-        }
-    };
+        const hideProfileMenu = () => {
+                setLayoutState((prevLayoutState: LayoutState) => ({
+                        ...prevLayoutState,
+                        profileSidebarVisible: false
+                }));
+                unbindProfileMenuOutsideClickListener();
+        };
 
-    useEffect(() => {
-        if (layoutState.overlayMenuActive || layoutState.staticMenuMobileActive) {
-            bindMenuOutsideClickListener();
-        }
+        const blockBodyScroll = (): void => {
+                if (document.body.classList) {
+                        document.body.classList.add('blocked-scroll');
+                } else {
+                        document.body.className += ' blocked-scroll';
+                }
+        };
 
-        layoutState.staticMenuMobileActive && blockBodyScroll();
-    }, [layoutState.overlayMenuActive, layoutState.staticMenuMobileActive]);
+        const unblockBodyScroll = (): void => {
+                if (document.body.classList) {
+                        document.body.classList.remove('blocked-scroll');
+                } else {
+                        document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+                }
+        };
 
-    useEffect(() => {
-        if (layoutState.profileSidebarVisible) {
-            bindProfileMenuOutsideClickListener();
-        }
-    }, [layoutState.profileSidebarVisible]);
+        useEffect(() => {
+                if (layoutState.overlayMenuActive || layoutState.staticMenuMobileActive) {
+                        bindMenuOutsideClickListener();
+                }
 
-    useUnmountEffect(() => {
-        unbindMenuOutsideClickListener();
-        unbindProfileMenuOutsideClickListener();
-    });
+                layoutState.staticMenuMobileActive && blockBodyScroll();
+        }, [layoutState.overlayMenuActive, layoutState.staticMenuMobileActive]);
 
-    const containerClass = classNames('layout-wrapper', {
-        'layout-overlay': layoutConfig.menuMode === 'overlay',
-        'layout-static': layoutConfig.menuMode === 'static',
-        'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
-        'layout-overlay-active': layoutState.overlayMenuActive,
-        'layout-mobile-active': layoutState.staticMenuMobileActive,
-        'p-input-filled': layoutConfig.inputStyle === 'filled',
-        'p-ripple-disabled': !layoutConfig.ripple
-    });
+        useEffect(() => {
+                if (layoutState.profileSidebarVisible) {
+                        bindProfileMenuOutsideClickListener();
+                }
+        }, [layoutState.profileSidebarVisible]);
 
-    return (
-        <React.Fragment>
-            <div className={containerClass}>
-                <AppTopbar ref={topbarRef} />
-                <div ref={sidebarRef} className="layout-sidebar">
-                    <AppSidebar />
-                </div>
-                <div className="layout-main-container">
-                    <div className="layout-main">{children}</div>
-                    <AppFooter />
-                </div>
-                <AppConfig />
-                <div className="layout-mask"></div>
-            </div>
-        </React.Fragment>
-    );
+        useUnmountEffect(() => {
+                unbindMenuOutsideClickListener();
+                unbindProfileMenuOutsideClickListener();
+        });
+
+        const containerClass = classNames('layout-wrapper', {
+                'layout-overlay': layoutConfig.menuMode === 'overlay',
+                'layout-static': layoutConfig.menuMode === 'static',
+                'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
+                'layout-overlay-active': layoutState.overlayMenuActive,
+                'layout-mobile-active': layoutState.staticMenuMobileActive,
+                'p-input-filled': layoutConfig.inputStyle === 'filled',
+                'p-ripple-disabled': !layoutConfig.ripple
+        });
+
+        return (
+                <React.Fragment>
+                        <div className={containerClass}>
+                                <AppTopbar ref={topbarRef} />
+                                <div ref={sidebarRef} className="layout-sidebar">
+                                        <AppSidebar />
+                                </div>
+                                <div className="layout-main-container">
+                                        {tabs.length > 0 ? (
+                                                <TabManager children={children} />
+                                        ) : children
+                                        }
+                                        <AppFooter />
+                                </div>
+                                <AppConfig />
+                                <div className="layout-mask"></div>
+                        </div>
+                </React.Fragment>
+        );
 };
 
 export default Layout;
