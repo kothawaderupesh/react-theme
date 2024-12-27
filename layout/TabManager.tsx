@@ -29,6 +29,7 @@ const TabManager: React.FC<TabManagerProps> = ({ children }) => {
                         <TabView
                                 activeIndex={tabs.findIndex((tab) => tab.id === activeTab)}
                                 onTabChange={handleTabChange}
+                                scrollable
                         >
                                 {tabs.map((tab) => (
                                         <TabPanel
