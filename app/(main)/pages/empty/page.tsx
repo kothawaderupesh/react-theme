@@ -1,20 +1,43 @@
 'use client';
-import { TabProvider } from '@/layout/context/tab-context';
 import React from 'react';
-import DynamicTabMenu from '../../components/DynamicTab';
 
+import { TreeNode } from 'primereact/treenode';
+import TreeCrud from '../../components/TreeCrud';
 
-const Home: React.FC = () => {
+const Home = () => {
+    const initialTreeData: TreeNode[] = [
+        {
+            key: '1',
+            label: 'Root Node',
+            children: [
+                { key: '1-1', label: 'Child Node 1' },
+                { key: '1-2', label: 'Child Node 2' },
+            ],
+        },
+    ];
+
+    const handleCreate = (node: TreeNode, parentKey: string | null) => {
+        console.log('Node created:', node, 'Parent Key:', parentKey);
+    };
+
+    const handleUpdate = (node: TreeNode) => {
+        console.log('Node updated:', node);
+    };
+
+    const handleDelete = (nodeKey: string) => {
+        console.log('Node deleted with key:', nodeKey);
+    };
+
     return (
-        <TabProvider>
-            <div>
-                <h1>Dynamic Tab Menu Example</h1>
-                <p>This page demonstrates how to use the <strong>DynamicTabMenu</strong>.</p>
-
-                {/* DynamicTabMenu Component */}
-                <DynamicTabMenu />
-            </div>
-        </TabProvider>
+        <div>
+            <h1>Tree CRUD Example</h1>
+            <TreeCrud
+                initialData={initialTreeData}
+                onCreate={handleCreate}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+            />
+        </div>
     );
 };
 

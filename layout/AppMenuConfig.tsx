@@ -71,6 +71,7 @@ export const AppMenuConfig: AppMenuItem[] = [
                 ]
             },
             { label: 'Crud', icon: 'pi pi-fw pi-pencil', to: '/pages/crud' },
+            { label: 'Tree Crud', icon: 'pi pi-fw pi-pencil', to: '/pages/tree-crud' },
             { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/pages/timeline' },
             { label: 'Not Found', icon: 'pi pi-fw pi-exclamation-circle', to: '/pages/notfound' },
             { label: 'Empty', icon: 'pi pi-fw pi-circle-off', to: '/pages/empty' }
