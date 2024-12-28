@@ -19,10 +19,7 @@ const configOptions = ['Option 1', 'Option 2', 'Option 3'];
 const ConfigurableTablePage: React.FC = () => {
     return (
         <div>
-            <h1>Configurable Table</h1>
-            <ConfigurableTable
-                
-            />
+            <ConfigurableTable />
         </div>
     );
 };
