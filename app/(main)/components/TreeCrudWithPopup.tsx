@@ -36,7 +36,7 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
         label: string = ''
     ) => {
         setDialogMode(mode);
-        setCurrentNodeKey(key);
+        setCurrentNodeKey(key ? String(key) : null);
         setNodeLabel(label);
         setShowDialog(true);
     };
@@ -80,9 +80,7 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
     };
 
     const handleDeleteNode = () => {
-        const updatedNodes = nodes.filter(
-            (node) => !findNodeByKey(node, currentNodeKey as string)
-        );
+        const updatedNodes = removeNodeByKey(nodes, currentNodeKey as string);
         setNodes(updatedNodes);
         onDelete?.(currentNodeKey as string);
         setShowDialog(false);
@@ -114,6 +112,19 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
             }
         }
         return null;
+    };
+
+    const removeNodeByKey = (nodeList: TreeNode[], key: string): TreeNode[] => {
+        const updatedNodeList = nodeList.map((node) => {
+            if (node.key === key) {
+                return null;
+            }
+            if (node.children) {
+                node.children = removeNodeByKey(node.children, key);
+            }
+            return node;
+        }).filter((node) => node !== null) as TreeNode[];
+        return updatedNodeList;
     };
 
     const nodeTemplate = (node: TreeNode) => (

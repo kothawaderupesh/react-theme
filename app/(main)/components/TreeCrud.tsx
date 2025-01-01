@@ -54,9 +54,22 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
     };
 
     const deleteNode = (key: string) => {
-        const updatedNodes = nodes.filter((node) => !findNodeByKey(node, key));
+        const updatedNodes = removeNodeByKey(nodes, key as string);
         setNodes(updatedNodes);
-        onDelete?.(key);
+        onDelete?.(key as string);
+    };
+
+    const removeNodeByKey = (nodeList: TreeNode[], key: string): TreeNode[] => {
+        const updatedNodeList = nodeList.map((node) => {
+            if (node.key === key) {
+                return null;
+            }
+            if (node.children) {
+                node.children = removeNodeByKey(node.children, key);
+            }
+            return node;
+        }).filter((node) => node !== null) as TreeNode[];
+        return updatedNodeList;
     };
 
     const updateChildNode = (
