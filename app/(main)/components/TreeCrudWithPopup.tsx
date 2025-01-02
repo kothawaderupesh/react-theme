@@ -5,6 +5,7 @@ import { TreeNode } from 'primereact/treenode';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import './TreeCrud.css';
 
 type TreeCrudProps = {
     initialData: TreeNode[];
@@ -150,19 +151,6 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
                     onClick={() => openDialog('delete', node.key)}
                 />
             </div>
-            <style jsx>{`
-        .node-wrapper {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .node-actions {
-          visibility: hidden;
-        }
-        .node-wrapper:hover .node-actions {
-          visibility: visible;
-        }
-      `}</style>
         </div>
     );
 

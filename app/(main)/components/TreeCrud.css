@@ -1,0 +1,22 @@
+.node-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.node-label {
+    flex-grow: 1;
+}
+
+.node-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 2rem;
+    visibility: hidden;
+    /* Distance from the label */
+}
+
+.node-wrapper:hover .node-actions {
+    visibility: visible;
+}
