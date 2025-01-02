@@ -130,7 +130,7 @@ const TreeCrud: React.FC<TreeCrudProps> = ({
 
     const nodeTemplate = (node: TreeNode) => (
         <div className="node-wrapper">
-            <span>{node.label}</span>
+            <span className="node-label">{node.label}</span>
             <div className="node-actions">
                 <Button
                     icon="pi pi-plus"
